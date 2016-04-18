@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="org.butioy.webim.web.dao.IUserFriendDao">
+
+	<resultMap id="RM_UserFriend" type="org.butioy.webim.web.domain.UserFriend">
+		<result property="id" column="ID"/>
+		<result property="user" column="USER"/>
+		<result property="friend" column="FRIEND"/>
+		<result property="friendGroupId" column="FRIEND_GROUP_ID"/>
+		<result property="createTime" column="CREATE_TIME"/>
+		<result property="updateTime" column="UPDATE_TIME"/>
+	</resultMap>
+
+	<resultMap id="RM_UserFriend_Group" type="org.butioy.webim.web.dto.UserGroupFriend">
+		<id property="id" column="FRIEND_ID"/>
+		<result property="name" column="FRIEND_GROUP_NAME"/>
+		<collection property="item" ofType="org.butioy.webim.web.dto.UserFriend">
+			<result property="id" column="ACCOUNT"/>
+			<result property="name" column="NICK_NAME"/>
+			<result property="face" column="IMG"/>
+		</collection>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="select_all_column">
+	    <![CDATA[
+		ID,USER,FRIEND,FRIEND_GROUP_ID,CREATE_TIME,UPDATE_TIME
+		]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="org.butioy.webim.web.domain.UserFriend" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+		INSERT INTO im_user_friend (
+			ID, USER, FRIEND, FRIEND_GROUP_ID, CREATE_TIME, UPDATE_TIME
+		) VALUES (
+			#{id}, #{user}, #{friend}, #{friendGroupId}, #{createTime}, #{updateTime}
+		)
+		]]>
+	</insert>
+
+	<insert id="batchInsert" parameterType="list" useGeneratedKeys="true">
+		INSERT INTO im_user_friend
+		(ID,USER,FRIEND,FRIEND_GROUP_ID,CREATE_TIME,UPDATE_TIME) VALUES
+		<foreach collection ="list" item ="item" index ="index" separator =",">
+			(#{item.id},#{item.user},#{item.friend},#{item.friendGroupId},#{item.createTime},#{item.updateTime})
+		</foreach >
+	</insert>
+
+	<update id="update" parameterType="org.butioy.webim.web.domain.UserFriend">
+    <![CDATA[
+		UPDATE im_user_friend SET
+			USER = #{user} , FRIEND = #{friend} , FRIEND_GROUP_ID = #{friendGroupId} , CREATE_TIME = #{createTime} , UPDATE_TIME = #{updateTime}
+		WHERE
+			ID = #{id}
+		]]>
+	</update>
+
+	<delete id="deleteById" parameterType="int">
+		<![CDATA[
+		DELETE FROM im_user_friend WHERE
+			ID = #{id} 
+		]]>
+    </delete>
+
+	<delete id="deleteByIds" parameterType="string">
+		<![CDATA[
+		DELETE FROM im_user_friend WHERE
+			ID IN (#{value})
+		]]>
+	</delete>
+
+	<delete id="deleteByParam" parameterType="map">
+		DELETE FROM im_user_friend
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(user)">
+				AND USER = #{user}
+			</if>
+			<if test="@Ognl@isNotEmpty(friend)">
+				AND FRIEND = #{friend}
+			</if>
+			<if test="@Ognl@isNotEmpty(friendGroupId)">
+				AND FRIEND_GROUP_ID = #{friendGroupId}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(updateTime)">
+				AND UPDATE_TIME = #{updateTime}
+			</if>
+		</where>
+	</delete>
+
+	<select id="findById" resultMap="RM_UserFriend">
+		SELECT <include refid="select_all_column" />
+		<![CDATA[
+		    FROM im_user_friend 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+
+	<select id="findList" resultMap="RM_UserFriend" parameterType="map">
+		SELECT <include refid="select_all_column"/>
+		FROM im_user_friend
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(user)">
+				AND USER = #{user}
+			</if>
+			<if test="@Ognl@isNotEmpty(friend)">
+				AND FRIEND = #{friend}
+			</if>
+			<if test="@Ognl@isNotEmpty(friendGroupId)">
+				AND FRIEND_GROUP_ID = #{friendGroupId}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(updateTime)">
+				AND UPDATE_TIME = #{updateTime}
+			</if>
+		</where>
+	</select>
+
+	<select id="findListByOwner" resultMap="RM_UserFriend_Group" parameterType="string">
+	<![CDATA[
+	SELECT
+		fg.ID AS FRIEND_ID,
+		fg.FRIEND_GROUP_NAME AS FRIEND_GROUP_NAME,
+		u.ACCOUNT AS ACCOUNT,
+		u.NICK_NAME AS NICK_NAME,
+		u.IMG AS IMG
+	FROM im_friend_group fg
+	LEFT JOIN im_user_friend uf ON fg.ID=uf.FRIEND_GROUP_ID
+	LEFT JOIN im_user u ON u.ACCOUNT = uf.FRIEND
+	WHERE fg.OWNER=#{0}
+	]]>
+	</select>
+
+</mapper>

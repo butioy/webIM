@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="org.butioy.webim.web.dao.IUserGroupDao">
+
+	<resultMap id="RM_UserGroup" type="org.butioy.webim.web.domain.UserGroup">
+		<result property="id" column="ID"/>
+		<result property="account" column="ACCOUNT"/>
+		<result property="groupCode" column="GROUP_CODE"/>
+	</resultMap>
+
+	<resultMap id="RM_GroupMember" type="org.butioy.webim.web.dto.UserFriend">
+		<result property="id" column="ACCOUNT"/>
+		<result property="name" column="NICK_NAME"/>
+		<result property="face" column="IMG"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="select_all_column">
+	    <![CDATA[
+		ID,ACCOUNT,GROUP_CODE
+		]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="org.butioy.webim.web.domain.UserGroup" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+		INSERT INTO im_user_group (
+			ID, ACCOUNT, GROUP_CODE
+		) VALUES (
+			#{id}, #{account}, #{groupCode}
+		)
+		]]>
+	</insert>
+
+	<insert id="batchInsert" parameterType="list" useGeneratedKeys="true">
+		INSERT INTO im_user_group
+		(ID,ACCOUNT,GROUP_CODE) VALUES
+		<foreach collection ="list" item ="item" index ="index" separator =",">
+			(#{item.id},#{item.account},#{item.groupCode})
+		</foreach >
+	</insert>
+
+	<update id="update" parameterType="org.butioy.webim.web.domain.UserGroup">
+    <![CDATA[
+		UPDATE im_user_group SET
+			ACCOUNT = #{account} , GROUP_CODE = #{groupCode}
+		WHERE
+			ID = #{id}
+		]]>
+	</update>
+
+	<delete id="deleteById" parameterType="int">
+		<![CDATA[
+		DELETE FROM im_user_group WHERE
+			ID = #{id} 
+		]]>
+    </delete>
+
+	<delete id="deleteByIds" parameterType="string">
+		<![CDATA[
+		DELETE FROM im_user_group WHERE
+			ID IN (#{value})
+		]]>
+	</delete>
+
+	<delete id="deleteByParam" parameterType="map">
+		DELETE FROM im_user_group
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(account)">
+				AND ACCOUNT = #{account}
+			</if>
+			<if test="@Ognl@isNotEmpty(groupCode)">
+				AND GROUP_CODE = #{groupCode}
+			</if>
+		</where>
+	</delete>
+
+	<select id="findById" resultMap="RM_UserGroup">
+		SELECT <include refid="select_all_column" />
+		<![CDATA[
+		    FROM im_user_group 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+
+	<select id="findList" resultMap="RM_UserGroup" parameterType="map">
+		SELECT <include refid="select_all_column"/>
+		FROM im_user_group
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(account)">
+				AND ACCOUNT = #{account}
+			</if>
+			<if test="@Ognl@isNotEmpty(groupCode)">
+				AND GROUP_CODE = #{groupCode}
+			</if>
+		</where>
+	</select>
+
+	<select id="findListByGroupId" resultMap="RM_GroupMember" parameterType="string">
+	<![CDATA[
+		SELECT u.ACCOUNT AS ACCOUNT, u.NICK_NAME AS NICK_NAME, u.IMG AS IMG
+		FROM im_user u
+		JOIN im_user_group g ON u.ACCOUNT=g.ACCOUNT AND g.GROUP_CODE=#{0}
+	]]>
+	</select>
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="org.butioy.webim.web.dao.IUserCodeDao">
+
+	<resultMap id="RM_UserCode" type="org.butioy.webim.web.domain.UserCode">
+		<result property="id" column="ID"/>
+		<result property="account" column="ACCOUNT"/>
+		<result property="isUsed" column="IS_USED"/>
+		<result property="createTime" column="CREATE_TIME"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="select_all_column">
+	    <![CDATA[
+		ID,ACCOUNT,IS_USED,CREATE_TIME
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="org.butioy.webim.web.domain.UserCode" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO im_user_code (
+         ID, ACCOUNT, IS_USED, CREATE_TIME
+        ) VALUES (
+         #{id}, #{account}, #{isUsed}, #{createTime}
+        )
+    ]]>
+	</insert>
+
+	<insert id="batchInsert" parameterType="list" useGeneratedKeys="true">
+	INSERT INTO im_user_code
+	(ID, ACCOUNT, IS_USED, CREATE_TIME) VALUES
+	<foreach collection ="list" item ="item" index ="index" separator =",">
+		(#{item.id}, #{item.account}, #{item.isUsed}, #{item.createTime})
+	</foreach >
+	</insert>
+    
+	<update id="update" parameterType="org.butioy.webim.web.domain.UserCode">
+    <![CDATA[
+        UPDATE im_user_code SET
+			ACCOUNT = #{account} , IS_USED = #{isUsed} , CREATE_TIME = #{createTime}
+        WHERE 
+        	ID = #{id}  	        
+    ]]>
+	</update>
+
+	<update id="updateByAccounts" parameterType="list">
+	<![CDATA[
+        UPDATE im_user_code SET IS_USED = 1
+    ]]>
+		<where>
+			ACCOUNT IN (<foreach collection ="list" item ="item" index ="index" separator=",">#{item}</foreach>)
+		</where>
+	</update>
+
+    <delete id="deleteById" parameterType="int">
+		<![CDATA[
+			DELETE FROM im_user_code WHERE
+			ID = #{id} 
+		]]>
+    </delete>
+
+	<delete id="deleteByIds" parameterType="string">
+		<![CDATA[
+			DELETE FROM im_user_code WHERE
+				ID IN (#{value})
+		]]>
+	</delete>
+
+    <delete id="deleteByParam" parameterType="map">
+		DELETE FROM im_user_code
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(code)">
+				AND ACCOUNT = #{account}
+			</if>
+			<if test="@Ognl@isNotEmpty(isUsed)">
+				AND IS_USED = #{isUsed}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+		</where>
+    </delete>
+    
+    <select id="findById" resultMap="RM_UserCode">
+		SELECT <include refid="select_all_column" />
+	    <![CDATA[
+		    FROM im_user_code 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+	
+    <select id="findList" resultMap="RM_UserCode" parameterType="map">
+	    SELECT <include refid="select_all_column"/>
+	    FROM im_user_code
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(account)">
+				AND ACCOUNT = #{account}
+			</if>
+			<if test="@Ognl@isNotEmpty(isUsed)">
+				AND IS_USED = #{isUsed}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+		</where>
+    </select>
+
+    <select id="findMaxAccount" resultMap="RM_UserCode">
+	    SELECT <include refid="select_all_column"/>
+	    FROM im_user_code ORDER BY ACCOUNT DESC LIMIT 0,1;
+    </select>
+
+	<select id="findByAccount" resultMap="RM_UserCode" parameterType="string">
+		SELECT <include refid="select_all_column"/>
+		FROM im_user_code WHERE ACCOUNT=#{0};
+	</select>
+
+	<select id="findMinUnusedAccount" resultMap="RM_UserCode">
+		SELECT <include refid="select_all_column"/>
+		FROM im_user_code WHERE IS_USED=0 ORDER BY ACCOUNT ASC LIMIT 0,1;
+	</select>
+
+</mapper>

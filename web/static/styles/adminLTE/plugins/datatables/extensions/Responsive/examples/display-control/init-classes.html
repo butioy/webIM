@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.butioy.auth.dao.IAuthRolePermissionMapper">
+    <resultMap id="RM_auth_role_permission" type="org.butioy.auth.domain.AuthRolePermission">
+        <id property="id" column="ID"/>
+        <result property="roleId" column="ROLE_ID"/>
+        <result property="permissionId" column="PERMISSION_ID"/>
+        <result property="departmentId" column="DEPARTMENT_ID"/>
+        <result property="permissionGroupId" column="PERMISSION_GROUP_ID"/>
+    </resultMap>
+
+    <sql id="select_all_column">
+        <![CDATA[
+          ID, ROLE_ID, PERMISSION_ID, DEPARTMENT_ID, PERMISSION_GROUP_ID
+        ]]>
+    </sql>
+
+    <sql id="select_all_column_by_t">
+        <![CDATA[
+          t.ID AS ID, t.ROLE_ID AS ROLE_ID, t.PERMISSION_ID AS PERMISSION_ID, t.DEPARTMENT_ID AS DEPARTMENT_ID, t.PERMISSION_GROUP_ID AS PERMISSION_GROUP_ID
+        ]]>
+    </sql>
+
+    <sql id="dynamic_insert_key">
+        <trim prefix="( " suffix=" )" suffixOverrides=",">
+            <if test="@Ognl@isNotEmpty(id)">
+                ID,
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                ROLE_ID,
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionId)">
+                PERMISSION_ID,
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentId)">
+                DEPARTMENT_ID,
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupId)">
+                PERMISSION_GROUP_ID,
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="dynamic_insert_value">
+        <trim prefix="( " suffix=" )" suffixOverrides=",">
+            <if test="@Ognl@isNotEmpty(id)">
+                #{id},
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                #{roleId},
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionId)">
+                #{permissionId},
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentId)">
+                #{departmentId},
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupId)">
+                #{permissionGroupId},
+            </if>
+        </trim>
+    </sql>
+
+    <insert id="insert" parameterType="org.butioy.auth.domain.AuthRolePermission" useGeneratedKeys="true">
+        INSERT INTO auth_role_permission <include refid="dynamic_insert_key"/>
+        VALUES <include refid="dynamic_insert_value"/>
+    </insert>
+
+    <update id="update" parameterType="org.butioy.auth.domain.AuthRolePermission">
+        <if test="@Ognl@isNotEmpty(id)">
+            UPDATE auth_role_permission
+            <set>
+                <if test="@Ognl@isNotEmpty(roleId)">
+                    ROLE_ID = #{roleId},
+                </if>
+                <if test="@Ognl@isNotEmpty(permissionId)">
+                    PERMISSION_ID = #{permissionId},
+                </if>
+                <if test="@Ognl@isNotEmpty(departmentId)">
+                    DEPARTMENT_ID = #{departmentId},
+                </if>
+                <if test="@Ognl@isNotEmpty(permissionGroupId)">
+                    PERMISSION_GROUP_ID = #{permissionGroupId},
+                </if>
+            </set>
+            WHERE ID=#{id}
+        </if>
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM auth_role_permission WHERE id=#{value}
+    </delete>
+
+    <delete id="deleteByParam" parameterType="map">
+        DELETE FROM auth_role_permission
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                AND ROLE_ID = #{roleId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionId)">
+                AND PERMISSION_ID = #{permissionId}
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentId)">
+                AND DEPARTMENT_ID = #{departmentId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupId)">
+                AND PERMISSION_GROUP_ID = #{permissionGroupId}
+            </if>
+            <if test="@Ognl@isNotEmpty(ids)">
+                AND ID IN (#{ids})
+            </if>
+            <if test="@Ognl@isNotEmpty(roleIds)">
+                AND ROLE_ID IN (#{roleIds})
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionIds)">
+                AND PERMISSION_ID IN (#{permissionIds})
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentIds)">
+                AND DEPARTMENT_ID IN (#{departmentIds})
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupIds)">
+                AND PERMISSION_GROUP_ID IN (#{permissionGroupIds})
+            </if>
+        </where>
+    </delete>
+
+    <select id="findById" parameterType="int" resultMap="RM_auth_role_permission">
+        SELECT <include refid="select_all_column"/> FROM auth_role_permission WHERE id=#{value}
+    </select>
+
+    <select id="findList" parameterType="map" resultMap="RM_auth_role_permission">
+        SELECT <include refid="select_all_column"/>
+        FROM auth_role_permission
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                AND ROLE_ID = #{roleId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionId)">
+                AND PERMISSION_ID = #{permissionId}
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentId)">
+                AND DEPARTMENT_ID = #{departmentId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupId)">
+                AND PERMISSION_GROUP_ID = #{permissionGroupId}
+            </if>
+            <if test="@Ognl@isNotEmpty(ids)">
+                AND ID IN (#{ids})
+            </if>
+            <if test="@Ognl@isNotEmpty(roleIds)">
+                AND ROLE_ID IN (#{roleIds})
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionIds)">
+                AND PERMISSION_ID IN (#{permissionIds})
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentIds)">
+                AND DEPARTMENT_ID IN (#{departmentIds})
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupIds)">
+                AND PERMISSION_GROUP_ID IN (#{permissionGroupIds})
+            </if>
+        </where>
+        <if test="@Ognl@isNotEmpty(orderBy)">
+            ORDER BY #{orderBy}
+        </if>
+    </select>
+
+    <select id="findDepartmentList" parameterType="map" resultMap="RM_auth_role_permission">
+        SELECT <include refid="select_all_column_by_t"/>
+        FROM auth_role_permission t
+        <if test="@Ognl@isNotEmpty(type)">
+            INNER JOIN auth_permission p ON(p.ID=t.PERMISSION_ID AND p.TYPE=#{type})
+        </if>
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND t.ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                AND t.ROLE_ID = #{roleId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionId)">
+                AND t.PERMISSION_ID = #{permissionId}
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentId)">
+                AND t.DEPARTMENT_ID = #{departmentId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupId)">
+                AND t.PERMISSION_GROUP_ID = #{permissionGroupId}
+            </if>
+        </where>
+        GROUP BY DEPARTMENT_ID
+        <if test="@Ognl@isNotEmpty(orderBy)">
+            ORDER BY #{orderBy}
+        </if>
+    </select>
+
+    <select id="findPermissionGroupList" parameterType="map" resultMap="RM_auth_role_permission">
+        SELECT <include refid="select_all_column_by_t"/>
+        FROM auth_role_permission t
+        <if test="@Ognl@isNotEmpty(type)">
+            INNER JOIN auth_permission p ON(p.ID=t.PERMISSION_ID AND p.TYPE=#{type})
+        </if>
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND t.ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                AND t.ROLE_ID = #{roleId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionId)">
+                AND t.PERMISSION_ID = #{permissionId}
+            </if>
+            <if test="@Ognl@isNotEmpty(departmentId)">
+                AND t.DEPARTMENT_ID = #{departmentId}
+            </if>
+            <if test="@Ognl@isNotEmpty(permissionGroupId)">
+        

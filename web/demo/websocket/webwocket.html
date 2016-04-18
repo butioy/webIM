@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.butioy.webSocket.dao.ISocketMessageLogMapper">
+    <resultMap id="RM_socket_message_log" type="org.butioy.webSocket.domain.SocketMessageLog">
+        <id property="id" column="ID"/>
+        <result property="fromUserCode" column="FROM_USER_CODE"/>
+        <result property="toUserCode" column="TO_USER_CODE"/>
+        <result property="message" column="MESSAGE"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="isConsume" column="IS_CONSUME"/>
+    </resultMap>
+
+    <sql id="select_all_column">
+        <![CDATA[
+          ID, FROM_USER_CODE, TO_USER_CODE, MESSAGE, ADD_TIME, IS_CONSUME
+        ]]>
+    </sql>
+
+    <sql id="select_socket_message_log_List_column">
+        <![CDATA[
+          t.ID AS ID, t.FROM_USER_CODE AS FROM_USER_CODE, t.TO_USER_CODE AS TO_USER_CODE,
+          t.MESSAGE AS MESSAGE, t.ADD_TIME AS ADD_TIME, t.IS_CONSUME AS IS_CONSUME
+        ]]>
+    </sql>
+
+    <sql id="dynamic_insert_key">
+        <trim prefix="( " suffix=" )" suffixOverrides=",">
+            <if test="@Ognl@isNotEmpty(id)">
+                ID,
+            </if>
+            <if test="@Ognl@isNotEmpty(fromUserCode)">
+                FROM_USER_CODE,
+            </if>
+            <if test="@Ognl@isNotEmpty(toUserCode)">
+                TO_USER_CODE,
+            </if>
+            <if test="@Ognl@isNotEmpty(message)">
+                MESSAGE,
+            </if>
+            <if test="@Ognl@isNotEmpty(addTime)">
+                ADD_TIME,
+            </if>
+            <if test="@Ognl@isNotEmpty(isConsume)">
+                IS_CONSUME,
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="dynamic_insert_value">
+        <trim prefix="( " suffix=" )" suffixOverrides=",">
+            <if test="@Ognl@isNotEmpty(id)">
+                #{id},
+            </if>
+            <if test="@Ognl@isNotEmpty(fromUserCode)">
+                #{fromUserCode},
+            </if>
+            <if test="@Ognl@isNotEmpty(toUserCode)">
+                #{toUserCode},
+            </if>
+            <if test="@Ognl@isNotEmpty(message)">
+                #{message},
+            </if>
+            <if test="@Ognl@isNotEmpty(addTime)">
+                #{addTime},
+            </if>
+            <if test="@Ognl@isNotEmpty(isConsume)">
+                #{isConsume},
+            </if>
+        </trim>
+    </sql>
+
+    <insert id="insert" parameterType="org.butioy.webSocket.domain.SocketMessageLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO socket_message_log <include refid="dynamic_insert_key"/>
+        VALUES <include refid="dynamic_insert_value"/>
+    </insert>
+
+    <update id="update" parameterType="org.butioy.webSocket.domain.SocketMessageLog">
+        <if test="@Ognl@isNotEmpty(id)">
+            UPDATE socket_message_log
+            <set>
+                <if test="@Ognl@isNotEmpty(fromUserCode)">
+                    FROM_USER_CODE = #{fromUserCode},
+                </if>
+                <if test="@Ognl@isNotEmpty(toUserCode)">
+                    TO_USER_CODE = #{toUserCode},
+                </if>
+                <if test="@Ognl@isNotEmpty(message)">
+                    MESSAGE = #{message},
+                </if>
+                <if test="@Ognl@isNotEmpty(addTime)">
+                    ADD_TIME = #{addTime},
+                </if>
+                <if test="@Ognl@isNotEmpty(isConsume)">
+                    IS_CONSUME = #{isConsume},
+                </if>
+            </set>
+            WHERE ID=#{id}
+        </if>
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM socket_message_log WHERE id=#{id}
+    </delete>
+
+    <delete id="deleteByParam" parameterType="map">
+        DELETE FROM socket_message_log
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(fromUserCode)">
+                AND FROM_USER_CODE = #{fromUserCode}
+            </if>
+            <if test="@Ognl@isNotEmpty(toUserCode)">
+                AND TO_USER_CODE = #{toUserCode}
+            </if>
+            <if test="@Ognl@isNotEmpty(message)">
+                AND MESSAGE = #{message}
+            </if>
+            <if test="@Ognl@isNotEmpty(addTime)">
+                AND ADD_TIME = #{addTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(isConsume)">
+                AND IS_CONSUME = #{isConsume}
+            </if>
+            <if test="@Ognl@isNotEmpty(ids)">
+                AND ID IN #{ids}
+            </if>
+        </where>
+    </delete>
+    <select id="findById" parameterType="int" resultMap="RM_socket_message_log">
+        SELECT <include refid="select_all_column"/>
+        FROM socket_message_log
+        WHERE id=#{id}
+    </select>
+
+    <select id="findList" parameterType="map" resultMap="RM_socket_message_log">
+        SELECT <include refid="select_all_column"/>
+        FROM socket_message_log
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(fromUserCode)">
+                AND FROM_USER_CODE = #{fromUserCode}
+            </if>
+            <if test="@Ognl@isNotEmpty(toUserCode)">
+                AND TO_USER_CODE = #{toUserCode}
+            </if>
+            <if test="@Ognl@isNotEmpty(message)">
+                AND MESSAGE = #{message}
+      

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="org.butioy.webim.web.dao.IMessageLogDao">
+
+	<resultMap id="RM_MessageLog" type="org.butioy.webim.web.domain.MessageLog">
+		<result property="id" column="ID"/>
+		<result property="fromUser" column="FROM_USER"/>
+		<result property="toUser" column="TO_USER"/>
+		<result property="content" column="CONTENT"/>
+		<result property="msgType" column="MSG_TYPE"/>
+		<result property="createTime" column="CREATE_TIME"/>
+		<result property="consumeStatus" column="CONSUME_STATUS"/>
+		<result property="consumeTime" column="CONSUME_TIME"/>
+	</resultMap>
+
+	<resultMap id="RM_Message_dto" type="org.butioy.webim.web.dto.MessageDto">
+		<result property="id" column="ID"/>
+		<result property="time" column="TIME"/>
+		<result property="name" column="NAME"/>
+		<result property="face" column="FACE"/>
+		<result property="content" column="CONTENT"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="select_all_column">
+	    <![CDATA[
+		ID,FROM_USER,TO_USER,CONTENT,MSG_TYPE,CREATE_TIME,CONSUME_STATUS,CONSUME_TIME
+		]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="org.butioy.webim.web.domain.MessageLog" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+		INSERT INTO im_message_log (
+			ID, FROM_USER, TO_USER, CONTENT, MSG_TYPE, CREATE_TIME, CONSUME_STATUS, CONSUME_TIME
+		) VALUES (
+			#{id}, #{fromUser}, #{toUser}, #{content}, #{msgType}, #{createTime}, #{consumeStatus}, #{consumeTime}
+		)
+		]]>
+	</insert>
+
+	<insert id="batchInsert" parameterType="list" useGeneratedKeys="true">
+		INSERT INTO im_message_log
+		(ID,FROM_USER,TO_USER,CONTENT,MSG_TYPE,CREATE_TIME,CONSUME_STATUS,CONSUME_TIME) VALUES
+		<foreach collection ="list" item ="item" index ="index" separator =",">
+			(#{item.id},#{item.fromUser},#{item.toUser},#{item.content},#{item.msgType},#{item.createTime},#{item.consumeStatus},#{item.consumeTime})
+		</foreach >
+	</insert>
+
+	<update id="update" parameterType="org.butioy.webim.web.domain.MessageLog">
+    <![CDATA[
+		UPDATE im_message_log SET
+			FROM_USER = #{fromUser} , TO_USER = #{toUser} , CONTENT = #{content} , MSG_TYPE = #{msgType} , CREATE_TIME = #{createTime} , CONSUME_STATUS = #{consumeStatus} , CONSUME_TIME = #{consumeTime}
+		WHERE
+			ID = #{id}
+		]]>
+	</update>
+
+	<update id="dynamicUpdate" parameterType="org.butioy.webim.web.domain.MessageLog">
+        UPDATE im_message_log
+		<set>
+			<if test="@Ognl@isNotEmpty(from)">FROM_USER_CODE = #{from},</if>
+			<if test="@Ognl@isNotEmpty(to)">TO_USER_CODE = #{toUserCode},</if>
+			<if test="@Ognl@isNotEmpty(content)">CONTENT = #{content},</if>
+			<if test="@Ognl@isNotEmpty(type)">TYPE = #{type},</if>
+			<if test="@Ognl@isNotEmpty(createTime)">CREATE_TIME = #{createTime},</if>
+			<if test="@Ognl@isNotEmpty(consumeStatus)">CONSUME_STATUS = #{consumeStatus},</if>
+			<if test="@Ognl@isNotEmpty(consumeTime)">CONSUME_TIME = #{consumeTime},</if>
+		</set>
+		WHERE
+        	ID = #{id}
+	</update>
+
+	<delete id="deleteById" parameterType="int">
+		<![CDATA[
+		DELETE FROM im_message_log WHERE
+			ID = #{id} 
+		]]>
+    </delete>
+
+	<delete id="deleteByIds" parameterType="string">
+		<![CDATA[
+		DELETE FROM im_message_log WHERE
+			ID IN (#{value})
+		]]>
+	</delete>
+
+	<delete id="deleteByParam" parameterType="map">
+		DELETE FROM im_message_log
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(fromUser)">
+				AND FROM_USER = #{fromUser}
+			</if>
+			<if test="@Ognl@isNotEmpty(toUser)">
+				AND TO_USER = #{toUser}
+			</if>
+			<if test="@Ognl@isNotEmpty(content)">
+				AND CONTENT = #{content}
+			</if>
+			<if test="@Ognl@isNotEmpty(msgType)">
+				AND MSG_TYPE = #{msgType}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(consumeStatus)">
+				AND CONSUME_STATUS = #{consumeStatus}
+			</if>
+			<if test="@Ognl@isNotEmpty(consumeTime)">
+				AND CONSUME_TIME = #{consumeTime}
+			</if>
+		</where>
+	</delete>
+
+	<select id="findById" resultMap="RM_MessageLog">
+		SELECT <include refid="select_all_column" />
+		<![CDATA[
+		    FROM im_message_log 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+
+	<select id="findList" resultMap="RM_MessageLog" parameterType="map">
+		SELECT <include refid="select_all_column"/>
+		FROM im_message_log
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(fromUser)">
+				AND FROM_USER = #{fromUser}
+			</if>
+			<if test="@Ognl@isNotEmpty(toUser)">
+				AND TO_USER = #{toUser}
+			</if>
+			<if test="@Ognl@isNotEmpty(content)">
+				AND CONTENT = #{content}
+			</if>
+			<if test="@Ognl@isNotEmpty(msgType)">
+				AND MSG_TYPE = #{msgType}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(consumeStatus)">
+				AND CONSUME_STATUS = #{consumeStatus}
+			</if>
+			<if test="@Ognl@isNotEmpty(consumeTime)">
+				AND CONSUME_TIME = #{consumeTime}
+			</if>
+		</where>
+	</select>
+
+	<select id="findUserNonConsumeMessageList" resultMap="RM_Message_dto">
+	<![CDATA[
+		SELECT
+			ml.ID AS ID,
+			DATE_FORMAT(ml.CREATE_TIME,'%Y-%m-%d %H:%i:%s') AS TIME,
+			u.USER_NAME AS NAME,
+			u.IMG AS FACE,
+			ml.CONTENT AS CONTENT
+		FROM im_message_log ml
+		LEFT JOIN im_user u
+		ON ml.FROM_USER=u.USER_CODE
+		WHERE ml.FROM_USER = #{fromUser}
+			AND ml.TO_USER=#{toUser}
+			AND ml.MSG_TYPE=#{msgType}
+			AND ml.CONSUME_STATUS=#{consumeStatus}
+	]]>
+	</select>
+
+</mapper>

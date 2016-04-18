@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+              http://www.springframework.org/schema/beans
+              http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+              http://www.springframework.org/schema/context
+              http://www.springframework.org/schema/context/spring-context-4.1.xsd
+              ">
+
+       <!--<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">-->
+              <!--<property name="location" value="classpath*:application.properties"/>-->
+       <!--</bean>-->
+
+       <context:property-placeholder location="classpath:/application.properties" ignore-unresolvable="true"/>
+
+       <!-- DBCP 数据源 定义 -->
+       <!--<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">-->
+              <!--<property name="driverClassName" value="${jdbc.driver_class_name}"/>-->
+              <!--<property name="url" value="${jdbc.url}"/>-->
+              <!--<property name="username" value="${jdbc.username}"/>-->
+              <!--<property name="password" value="${jdbc.password}"/>-->
+
+              <!--&lt;!&ndash; 当这个池被启动时初始化的创建的连接个数，起始生效版本：1.2 &ndash;&gt;-->
+              <!--<property name="initialSize" value="${connection.initialSize}"/>-->
+              <!--&lt;!&ndash; 可以在这个池中同时被分配的有效连接数的最大值，如设置为负数，则不限制 &ndash;&gt;-->
+              <!--<property name="maxTotal" value="${connection.maxActive}"/>-->
+              <!--&lt;!&ndash; 可以在池中保持空闲的最大连接数，超出设置值之外的空闲连接将被回收，如设置为负数，则不限制 &ndash;&gt;-->
+              <!--<property name="maxIdle" value="${connection.maxActive}"/>-->
+              <!--&lt;!&ndash; 可以在池中保持空闲的最小连接数，超出设置值之外的空闲连接将被创建，如设置为0，则不创建 &ndash;&gt;-->
+              <!--<property name="minIdle" value="${connection.minIdle}"/>-->
+              <!--&lt;!&ndash; （如果没有可用连接）池在抛出异常前等待的一个连接被归还的最大毫秒数，设置为-1则等待时间不确定 &ndash;&gt;-->
+              <!--<property name="maxWaitMillis" value="${connection.maxWaitMillis}"/>-->
+
+              <!--&lt;!&ndash; 在连接池返回连接给调用者前用来进行连接校验的查询sql。-->
+              <!--如果指定，则这个查询必须是一个至少返回一行数据的SQL SELECT语句。-->
+              <!--如果没有指定，则连接将通过调用isValid() 方法进行校验。 &ndash;&gt;-->
+              <!--<property name="validationQuery" value="${connection.validationQuery}"/>-->
+              <!--&lt;!&ndash; 指明对象在创建后是否需要被校验，如果对象校验失败，则触发对象创建的租借尝试将失败。 &ndash;&gt;-->
+              <!--<property name="testOnCreate" value="${connection.testOnCreate}"/>-->
+              <!--&lt;!&ndash; 指明在从池中租借对象时是否要进行校验，如果对象校验失败，则对象将从池子释放，然后我们将尝试租借另一个 &ndash;&gt;-->
+              <!--<property name="testOnBorrow" value="${connection.testOnBorrow}"/>-->
+              <!--&lt;!&ndash; 指明在将对象归还给连接池前是否需要校验。 &ndash;&gt;-->
+              <!--<property name="testOnReturn" value="${connection.testOnReturn}"/>-->
+              <!--&lt;!&ndash; 指明对象是否需要通过对象驱逐者进行校验（如果有的话），假如一个对象校验失败，则对象将被从池中释放。 &ndash;&gt;-->
+              <!--<property name="testWhileIdle" value="${connection.testWhileIdle}"/>-->
+              <!--&lt;!&ndash; 空闲对象驱逐线程运行时的休眠毫秒数，如果设置为非正数，则不运行空闲对象驱逐线程。 &ndash;&gt;-->
+              <!--<property name="timeBetweenEvictionRunsMillis" value="${connection.timeBetweenEvictionRunsMillis}"/>-->
+       <!--</bean>-->
+
+       <!-- druid 数据源 定义 -->
+       <!--<bean id="druidDatabase" class="com.alibaba.druid.pool.DruidDataSource"-->
+             <!--init-method="init"-->
+             <!--destroy-method="close"-->
+             <!--p:driverClassName="${jdbc.driver_class_name}"-->
+             <!--p:url="${jdbc.url}"-->
+             <!--p:username="${jdbc.username}"-->
+             <!--p:password="${jdbc.password}"-->
+             <!--p:initialSize="2"-->
+             <!--p:maxActive="${connection.maxActive}"-->
+             <!--p:minIdle="${connection.minIdle}"-->
+             <!--p:maxWait="${connection.maxWaitMillis}"-->
+             <!--p:timeBetweenEvictionRunsMillis="${connection.timeBetweenEvictionRunsMillis}"-->
+             <!--p:minEvictableIdleTimeMillis="${connection.minEvictableIdleTimeMillis}"-->
+             <!--p:validationQuery="${connection.validationQuery}"-->
+             <!--p:testWhileIdle="${connection.testWhileIdle}"-->
+             <!--p:testOnBorrow="${connection.testOnBorrow}"-->
+             <!--p:testOnReturn="${connection.testOnReturn}"-->
+             <!--p:poolPreparedStatements="${connection.poolPreparedStatements}"-->
+             <!--p:maxPoolPreparedStatementPerConnectionSize="${connection.maxPoolPreparedStatementPerConnectionSize}"-->
+             <!--p:filters="${filter.filters}"-->
+       <!--/>-->
+
+       <bean id="druidDatabase" class="com.alibaba.druid.pool.DruidDataSource"
+             init-method="init"
+             destroy-method="close"
+             lazy-init="true"
+       >
+              <!-- 基本属性配置 -->
+              <property name="driverClassName" value="${jdbc.driver_class_name}"/>
+              <property name="url" value="${jdbc.url}"/>
+              <property name="username" value="${jdbc.username}"/>
+              <property name="password" value="${jdbc.password}"/>
+
+              <!-- 初始化连接，最大、最小连接 -->
+              <property name="initialSize" value="${connection.initialSize}"/>
+              <property name="maxActive" value="${connection.maxActive}"/>
+              <property name="minIdle" value="${connection.minIdle}"/>
+
+              <!-- 配置获取连接等待超时的时间 -->
+              <property name="maxWait" value="${connection.maxWaitMillis}"/>
+
+              <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+              <property name="timeBetweenEvictionRunsMillis" value="${connection.timeBetweenEvictionRunsMillis}"/>
+
+              <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+              <property name="minEvictableIdleTimeMillis" value="${connection.minEvictableIdleTimeMillis}"/>
+
+              <property name="validationQuery" value="${connection.validationQuery}" />
+              <property name="testWhileIdle" value="${connection.testWhileIdle}" />
+              <property name="testOnBorrow" value="${connection.testOnBorrow}" />
+              <property name="testOnReturn" value="${connection.testOnReturn}" />
+              <!--<property name="testOnCreate" value="${connection.testOnCreate}"/>-->
+
+              <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+              <property name="poolPreparedStatements" value="${connection.poolPreparedStatements}" />
+              <property name="maxPoolPreparedStatementPerConnectionSize" value="${connection.maxPoolPreparedStatementPerConnectionSize}" />
+
+              <!-- 配置监控统计拦截的filters -->
+              <property name="filters" value="${filter.filters}" />
+       </bean>
+
+</beans>

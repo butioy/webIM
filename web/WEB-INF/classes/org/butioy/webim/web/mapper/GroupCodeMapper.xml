@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="org.butioy.webim.web.dao.IGroupCodeDao">
+
+	<resultMap id="RM_GroupCode" type="org.butioy.webim.web.domain.GroupCode">
+		<result property="id" column="ID"/>
+		<result property="groupCode" column="GROUP_CODE"/>
+		<result property="isUsed" column="IS_USED"/>
+		<result property="createTime" column="CREATE_TIME"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="select_all_column">
+	    <![CDATA[
+		ID,GROUP_CODE,IS_USED,CREATE_TIME
+		]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="org.butioy.webim.web.domain.GroupCode" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+        INSERT INTO im_group_code (
+         ID, GROUP_CODE, IS_USED, CREATE_TIME
+        ) VALUES (
+         #{id}, #{groupCode}, #{isUsed}, #{createTime}
+        )
+    ]]>
+	</insert>
+
+	<insert id="batchInsert" parameterType="list" useGeneratedKeys="true">
+		INSERT INTO im_group_code
+		(ID,GROUP_CODE,IS_USED,CREATE_TIME) VALUES
+		<foreach collection ="list" item ="item" index ="index" separator =",">
+			(#{item.id},#{item.groupCode},#{item.isUsed},#{item.createTime})
+		</foreach >
+	</insert>
+
+	<update id="update" parameterType="org.butioy.webim.web.domain.GroupCode">
+		<![CDATA[
+        UPDATE im_group_code SET
+	        GROUP_CODE = #{groupCode} , IS_USED = #{isUsed} , CREATE_TIME = #{createTime}
+        WHERE
+        	ID = #{id}
+    ]]>
+	</update>
+
+	<delete id="deleteById" parameterType="int">
+		<![CDATA[
+		DELETE FROM im_group_code WHERE
+			ID = #{id}
+		]]>
+    </delete>
+
+	<delete id="deleteByIds" parameterType="string">
+		<![CDATA[
+			DELETE FROM im_group_code WHERE
+				ID IN (#{value})
+		]]>
+	</delete>
+
+	<delete id="deleteByParam" parameterType="map">
+		DELETE FROM im_group_code
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(groupCode)">
+				AND GROUP_CODE = #{groupCode}
+			</if>
+			<if test="@Ognl@isNotEmpty(isUsed)">
+				AND IS_USED = #{isUsed}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+		</where>
+	</delete>
+
+	<select id="findById" resultMap="RM_GroupCode">
+		SELECT <include refid="select_all_column" />
+		<![CDATA[
+		    FROM im_group_code
+	        WHERE
+		        ID = #{id}
+	    ]]>
+	</select>
+
+	<select id="findList" resultMap="RM_GroupCode" parameterType="map">
+		SELECT <include refid="select_all_column"/>
+		FROM im_group_code
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(groupCode)">
+				AND GROUP_CODE = #{groupCode}
+			</if>
+			<if test="@Ognl@isNotEmpty(isUsed)">
+				AND IS_USED = #{isUsed}
+			</if>
+			<if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+		</where>
+	</select>
+
+</mapper>
