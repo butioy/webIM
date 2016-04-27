@@ -30,6 +30,7 @@
 
 # IntelliJ
 /out/
+/.idea
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -97,6 +98,7 @@ local.properties
 
 # Java ignore
 *.class
+/web/WEB-INF/classes/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
