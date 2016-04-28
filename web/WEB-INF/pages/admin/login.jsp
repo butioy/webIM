@@ -73,11 +73,12 @@
     $("#login").on("click", function() {
       $.ajax({
         url : "${ctx}/admin/doLogin",
-        type : "get",
+        type : "post",
         data : $("#login-form").serialize(),
         dateType : "json",
         success : function(resp) {
-          if( resp.status == "success" ) {
+          debugger;
+          if( resp.status === "success" ) {
             $("#message").text("登录成功，正在跳转...");
             window.location.href = "${ctx}/admin/index";
           } else {
@@ -85,7 +86,7 @@
             $("#message").html(html);
           }
         },
-        error : function() {
+        error : function(t) {
 
         }
       });
