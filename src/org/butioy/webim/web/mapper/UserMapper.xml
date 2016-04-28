@@ -135,7 +135,7 @@
 		</where>
 	</select>
 
-    <select id="findByUserCode" resultMap="RM_User" parameterType="string">
+    <select id="findByAccount" resultMap="RM_User" parameterType="string">
 	    SELECT <include refid="select_all_column"/>
 	    FROM im_user
 		<where>

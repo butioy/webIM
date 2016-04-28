@@ -40,11 +40,11 @@ To change this template use File | Settings | File Templates.
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">
-    <p class="login-box-msg">登录后开始聊天</p>
+    <p class="login-box-msg" id="message">登录后开始聊天</p>
 
     <form action="" method="post" id="login-form">
       <div class="form-group has-feedback">
-        <input type="text" name="userCode" class="form-control" placeholder="帐号">
+        <input type="text" name="account" class="form-control" placeholder="帐号">
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
@@ -106,10 +106,7 @@ To change this template use File | Settings | File Templates.
     });
     $("#login_btn").on("click", function() {
       $.post("${ctx}/user/doLogin", $("#login-form").serialize(), function (resp) {
-        if (typeof(resp) == "string") {
-          resp = $.parseJSON(resp);
-        }
-        if (resp.status == "success") {
+        if (resp.status === "success") {
           $(".login-box-body").children().hide();
           $("#login_success").html("<p>登录成功，<span id='interval'>5</span>秒后跳转到聊天页！</p>");
           $("#login_success").show();
@@ -121,8 +118,11 @@ To change this template use File | Settings | File Templates.
               window.clearInterval(intervalIndex);
             }
           }, 1000);
+        } else {
+          $("#login_success").html('<p style="color:#FF2F2F;">'+resp.message+'</p>');
+          $("#login_success").show();
         }
-      });
+      },'json');
     });
   });
 </script>
