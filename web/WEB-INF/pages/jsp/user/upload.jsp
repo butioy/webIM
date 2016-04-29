@@ -17,10 +17,7 @@ To change this template use File | Settings | File Templates.
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
     <link rel="stylesheet" href="${ctx}/static/bootstrap/css/bootstrap.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="${ctx}/static/font-awesome/css/font-awesome.min.css">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="${ctx}/static/ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="${ctx}/static/font-awesome/css/font-awesome.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="${ctx}/static/adminlte/css/AdminLTE.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -29,35 +26,39 @@ To change this template use File | Settings | File Templates.
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <style>
+        .remove{
+            position: absolute;
+            background: #000;
+            opacity: 0.5;
+            height: 40px;
+            left: 0px;
+            top: 0px;
+        }
+    </style>
 </head>
-<body class="hold-transition login-page">
-<div class="login-box">
-    <div class="login-logo">
-        <a href="${ctx}/user/login"><b> BUTIOY </b>WebIM</a>
-    </div>
-    <!-- /.login-logo -->
-    <div class="login-box-body">
-        <p class="login-box-msg" id="message">登录后开始聊天</p>
-
-        <form action="" method="post" id="login-form">
-            <div class="form-group has-feedback">
-                <input type="file" id="upload_img" class="form-control" placeholder="请选择图片"/>
-            </div>
-            <div class="form-group row">
-                <div class="col-xs-6">
-                    <button type="button" id="select_btn" class="btn btn-primary btn-block btn-flat">选择文件</button>
-                </div>
-                <div class="col-xs-6">
-                    <button type="button" id="upload_btn" class="btn btn-primary btn-block btn-flat">开始上传</button>
+<body class="hold-transition skin-blue sidebar-mini fixed">
+<div class="wrapper">
+    <div class="content">
+        <input type="file" id="upload_img" placeholder="请选择图片" />
+        <div class="panel panel-info">
+            <div class="panel-body">
+                <div class="row" id="preview">
                 </div>
             </div>
-            <div class="form-group row" id="preview">
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-3 col-sm-4 col-xs-6">
+                        <button type="button" id="select_btn" class="btn btn-primary btn-block btn-flat">选择文件</button>
+                    </div>
+                    <div class="col-md-3 col-md-offset-6 col-sm-4 col-sm-offset-4 col-xs-6">
+                        <button type="button" id="upload_btn" class="btn btn-primary btn-block btn-flat">开始上传</button>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-    <!-- /.login-box-body -->
 </div>
-<!-- /.login-box -->
 
 <!-- jQuery 2.1.4 -->
 <script src="${ctx}/static/jQuery/jQuery-2.1.4.min.js"></script>
@@ -81,19 +82,26 @@ To change this template use File | Settings | File Templates.
             var reader = new FileReader();
             reader.onload = function( e ) {
                 var col = document.createElement('div');
-                col.className = 'col-xs-3';
+                col.className = 'col-md-3 col-sm-4 col-xs-6';
                 col.id='div_img_'+index;
                 p.appendChild(col);
                 var width = col.clientWidth;
-                col.style.height=width+'px';
-                col.style.lineHeight = width+'px';
-                col.style.border = '1px solid #ccc';
-                col.innerHTML = '<img alt="'+file.name+'" src="'+e.target.result+'" id="img_'+index+'"'+
-                        ' style="width:expression(this.width > '+width+' ? '+width+'px : this.width); max-width: 100%;"/>';
+                var preDiv = document.createElement('div');
+                preDiv.style.height=(width-30)+'px';
+                preDiv.style.lineHeight=(width-34)+'px';
+                preDiv.style.width=(width-30)+'px';
+                preDiv.style.border = '1px solid #ccc';
+                preDiv.style.textAlign = 'center';
+                preDiv.style.position = 'relative';
+                var htmls = '<div class="remove hidden" style="width: '+(width-30)+'px; font-size: 25px; color: #5897fb;">' +
+                        '<i class="col-xs-2 fa fa-undo pull-right" id="remove_'+index+'" style="line-height: 40px;"></i>' +
+                        '<i class="col-xs-2 fa fa-trash-o pull-right" id="rotation_'+index+'" style="line-height: 40px;"></i></div>';
+                preDiv.innerHTML = htmls+'<img title="'+file.name+'" src="'+e.target.result+'" id="img_'+index+'"'+
+                        ' style="max-width: '+(width-32)+'px; max-height: '+(width-32)+'px;"/>';
+                col.appendChild(preDiv);
             };
             reader.readAsDataURL(file);
         }
-
     });
 </script>
 </body>
