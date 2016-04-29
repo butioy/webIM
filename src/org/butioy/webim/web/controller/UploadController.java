@@ -1,48 +1,23 @@
 
 package org.butioy.webim.web.controller;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.butioy.framework.base.BaseController;
 import org.butioy.framework.resp.RespBean;
-import org.butioy.framework.util.MD5EncryptUtils;
+import org.butioy.framework.util.FileUtils;
 import org.butioy.framework.util.ParamUtils;
-import org.butioy.webim.utils.Cons;
-import org.butioy.webim.utils.MessageEnum;
-import org.butioy.webim.web.domain.MessageLog;
-import org.butioy.webim.web.domain.User;
-import org.butioy.webim.web.domain.UserFriend;
-import org.butioy.webim.web.dto.IMResult;
-import org.butioy.webim.web.dto.MessageDto;
-import org.butioy.webim.web.dto.UserGroupFriend;
-import org.butioy.webim.web.service.IGroupService;
-import org.butioy.webim.web.service.IMessageLogService;
-import org.butioy.webim.web.service.IUserFriendService;
-import org.butioy.webim.web.service.IUserGroupService;
-import org.butioy.webim.web.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.MultipartRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
-import java.util.Date;
-import java.util.Iterator;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,6 +33,8 @@ public class UploadController extends BaseController {
 
 	private final String LIST_ACTION = "redirect:/user";
 
+	private static final String UPLOAD_DIR = "/upload/files";
+
 	@RequestMapping("/toUpload")
 	public String toUpload() {
 		return "/user/upload";
@@ -65,14 +42,40 @@ public class UploadController extends BaseController {
 
 	@RequestMapping("/doUpload")
 	@ResponseBody
-	public RespBean doUpload( HttpServletRequest request, @RequestParam("file") MultipartFile file ) {
+	public RespBean doUpload( HttpServletRequest request ) {
 		RespBean bean = new RespBean();
 		if( request instanceof MultipartHttpServletRequest) {
+			String webRoot = FileUtils.getWebRootPath();
+			String uploadDir = ParamUtils.getParameter(request, "uploadDir");
+			if( uploadDir.length() <= 0 ) {
+				uploadDir = UPLOAD_DIR;
+			}
+			String saveDir = webRoot + uploadDir;
 			MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
-			Iterator<String> itr = req.getFileNames();
-			MultipartFile files = req.getFile("file");
-			while ( itr.hasNext() ) {
-				System.out.println(itr.next());
+			List<MultipartFile> files = req.getFiles("fileList");
+			try {
+				String[] filePaths = new String[files.size()];
+				int index = 0;
+				for( MultipartFile file : files ) {
+                    String uploadFileName = file.getOriginalFilename();
+                    boolean isValid = FileUtils.validFileName(uploadFileName);
+                    String fileName = "";
+                    String time = System.currentTimeMillis()+"";
+                    if( isValid ) {
+                        fileName = uploadFileName.substring(0,uploadFileName.lastIndexOf("."))+"_"+time;
+                        fileName += fileName+uploadFileName.substring(uploadFileName.lastIndexOf("."));
+                    } else {
+                        fileName = time+uploadFileName.substring(uploadFileName.lastIndexOf("."));
+                    }
+                    String filePath = saveDir+"/"+fileName;
+                    FileUtils.createFile(filePath);
+                    file.transferTo(new File(filePath));
+					filePaths[index++] = uploadDir+"/"+fileName;
+                }
+				bean.setSuccessData(StringUtils.join(filePaths));
+			} catch (IOException e) {
+				e.printStackTrace();
+				bean.setErrorMessage("服务器发生错误");
 			}
 		} else {
 			bean.setFailMessage("上传图片错误");
