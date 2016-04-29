@@ -14,7 +14,8 @@
         previewId : 'preview',
         repeat : false,
         multi : false,
-        paramName : 'file',
+        paramName : 'fileList',
+        uploadDir : '',
         accepts : '*',
         selected : function(file, index, allFiles){},
         uploadSuccess : function(file, index, allFiles, resp) {},
@@ -56,7 +57,7 @@
 
     BU.create = function() {
         input = document.getElementById(settings.fileId);
-        input.style.display = 'block';
+        input.style.display = 'none';
         if( !_bu.os.android && !_bu.os.ios ) {
             var accepts = settings.accepts;
             if( accepts.indexOf('*') === -1 ) {
@@ -91,31 +92,39 @@
             }
         });
         uploadBtn.addEventListener('click', function() {
+            var uploadFiles = [];
             allFiles.map(function( file, index, arr ) {
-                _bu.uploadProcess(file, index);
+                uploadFiles.push(file);
+                if( (index+1)%3 == 0 || index == arr.length-1 ) {
+                    _bu.uploadProcess(uploadFiles, index);
+                    uploadFiles = [];
+                }
             });
         });
     };
 
-    BU.uploadProcess = function(file, index) {
+    BU.uploadProcess = function(files, index) {
         var xhr = _bu.getXhr();
         var formData = new FormData();
-        formData.append(settings.paramName, file);
+        files.map(function(file){
+            formData.append(settings.paramName, file);
+            return;
+        });
+        formData.append('uploadDir', settings.uploadDir);
         xhr.onreadystatechange = function() {
             if( xhr.readyState === 4 ) {
                 if( xhr.status === 200 ) {
-                    settings.uploadSuccess.apply(null, [file, index, allFiles, xhr.responseText]);
+                    settings.uploadSuccess.apply(null, [files, index, allFiles, xhr.responseText]);
                 } else {
-                    settings.uploadFail.apply(null, [file, index, allFiles, xhr.responseText]);
+                    settings.uploadFail.apply(null, [files, index, allFiles, xhr.responseText]);
                 }
             }
         };
         xhr.onerror = function() {
-            settings.uploadError(file, index, allFiles, '');
+            settings.uploadError(files, index, allFiles, '');
         };
         xhr.onprogress = function() {
-            document.getElementById('progress').value = 10;
-
+            // document.getElementById('progress').value = 10;
         }
         xhr.open('POST', settings.url);
         xhr.send(formData);
@@ -141,6 +150,7 @@
         settings.multi = option.multi || settings.multi;
         settings.accepts = option.accepts || settings.accepts;
         settings.paramName = option.paramName || settings.paramName;
+        settings.uploadDir = option.uploadDir || settings.uploadDir;
         settings.selected = option.selected || settings.selected;
         settings.uploadSuccess = option.uploadSuccess || settings.uploadSuccess;
         settings.uploadComplete = option.uploadComplete || settings.uploadComplete;

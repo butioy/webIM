@@ -35,6 +35,12 @@ To change this template use File | Settings | File Templates.
             left: 0px;
             top: 0px;
         }
+        .wrapper, body {
+            min-width: 600px;
+            overflow-x: auto;
+        }
+        .row>div{
+            margin:10px 0px;}
     </style>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
@@ -42,18 +48,16 @@ To change this template use File | Settings | File Templates.
     <div class="content">
         <input type="file" id="upload_img" placeholder="请选择图片" />
         <div class="panel panel-info">
-            <div class="panel-body">
-                <div class="row" id="preview">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12 clearfix">
+                        <button type="button" id="upload_btn" class="btn btn-primary btn-flat btn-sm pull-right margin-l-5">开始上传</button>
+                        <button type="button" id="select_btn" class="btn bg-olive btn-flat btn-sm pull-right margin-l-5">选择文件</button>
+                    </div>
                 </div>
             </div>
-            <div class="panel-footer">
-                <div class="row">
-                    <div class="col-md-3 col-sm-4 col-xs-6">
-                        <button type="button" id="select_btn" class="btn btn-primary btn-block btn-flat">选择文件</button>
-                    </div>
-                    <div class="col-md-3 col-md-offset-6 col-sm-4 col-sm-offset-4 col-xs-6">
-                        <button type="button" id="upload_btn" class="btn btn-primary btn-block btn-flat">开始上传</button>
-                    </div>
+            <div class="panel-body">
+                <div class="row" id="preview">
                 </div>
             </div>
         </div>
@@ -77,27 +81,28 @@ To change this template use File | Settings | File Templates.
         repeat : false,
         multi : true,
         accepts:'png|jpeg|jpg|gif|bmp',
+        uploadDir:'/upload/files',
         selected:function(file, index, files) {
             var p = document.getElementById('preview');
             var reader = new FileReader();
             reader.onload = function( e ) {
                 var col = document.createElement('div');
-                col.className = 'col-md-3 col-sm-4 col-xs-6';
+                col.className = 'col-xs-2';
                 col.id='div_img_'+index;
                 p.appendChild(col);
                 var width = col.clientWidth;
                 var preDiv = document.createElement('div');
                 preDiv.style.height=(width-30)+'px';
                 preDiv.style.lineHeight=(width-34)+'px';
-                preDiv.style.width=(width-30)+'px';
+                preDiv.style.width='100%';
                 preDiv.style.border = '1px solid #ccc';
                 preDiv.style.textAlign = 'center';
                 preDiv.style.position = 'relative';
-                var htmls = '<div class="remove hidden" style="width: '+(width-30)+'px; font-size: 25px; color: #5897fb;">' +
+                var htmls = '<div class="remove hidden" style="width: 100%; font-size: 25px; color: #5897fb;">' +
                         '<i class="col-xs-2 fa fa-undo pull-right" id="remove_'+index+'" style="line-height: 40px;"></i>' +
                         '<i class="col-xs-2 fa fa-trash-o pull-right" id="rotation_'+index+'" style="line-height: 40px;"></i></div>';
                 preDiv.innerHTML = htmls+'<img title="'+file.name+'" src="'+e.target.result+'" id="img_'+index+'"'+
-                        ' style="max-width: '+(width-32)+'px; max-height: '+(width-32)+'px;"/>';
+                        ' style="max-width: 100%; max-height: '+(width-32)+'px;"/>';
                 col.appendChild(preDiv);
             };
             reader.readAsDataURL(file);
